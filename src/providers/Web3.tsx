@@ -10,7 +10,7 @@ interface Props {
   children: ReactNode
 }
 
-const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ?? ''
+const projectId = 'dc4331a62a60d3c9782c90949abc7b6f'
 if (!projectId) {
   console.warn('You need to provide a NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID env variable')
 }
