@@ -45,7 +45,7 @@ import React, { useEffect, useState } from 'react'
 import { FaPaste } from 'react-icons/fa'
 import { useDebounce } from 'components/useDebounce'
 
-export default function erc20() {
+export default function Erc20() {
   const router = useRouter()
   const [isSmallerThanMd] = useMediaQuery('(max-width: 48em)')
   const { chain } = useNetwork()
@@ -239,7 +239,7 @@ export default function erc20() {
     return (
       <Box>
         <InputGroup>
-          <InputLeftAddon children="Amount" />
+          <InputLeftAddon>Amount</InputLeftAddon>
           <Input
             onChange={(e) => {
               const value = e.target.value
@@ -274,7 +274,7 @@ export default function erc20() {
 
   const addressInputBox = (
     <InputGroup>
-      <InputLeftAddon children="Address" />
+      <InputLeftAddon>Address</InputLeftAddon>
       <Input
         value={receipientString}
         onChange={(e) => {

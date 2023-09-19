@@ -41,7 +41,7 @@ export default function Home() {
         <Text>
           Use this tool to easily use ERC20 tokens on any chain. <br />
           <br />
-          Here's an example of{' '}
+          Here is an example of{' '}
           <LinkComponent underlined={true} href="/erc20/137/0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174">
             {' '}
             USDC on Polygon
@@ -87,5 +87,3 @@ export default function Home() {
     </>
   )
 }
-
-function BasicUsage() {}
