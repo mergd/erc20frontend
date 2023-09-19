@@ -8,6 +8,7 @@ interface Props {
   children: ReactNode
   isExternal?: boolean
   className?: string
+  underlined?: boolean
 }
 
 export function LinkComponent(props: Props) {
@@ -24,7 +25,7 @@ export function LinkComponent(props: Props) {
   }
 
   return (
-    <Link as={NextLink} className={className} _hover={{ color: color }} href={props.href}>
+    <Link textDecoration={props.underlined ? 'underline' : ''} as={NextLink} className={className} _hover={{ color: color }} href={props.href}>
       {props.children}
     </Link>
   )

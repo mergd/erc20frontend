@@ -25,8 +25,8 @@ export function Seo() {
         ],
       }}
       twitter={{
-        handle: `@${SOCIAL_TWITTER}`,
-        site: `@${SOCIAL_TWITTER}`,
+        handle: `@$w_y_x`,
+        site: `@W_Y_X`,
         cardType: 'summary_large_image',
       }}
     />
