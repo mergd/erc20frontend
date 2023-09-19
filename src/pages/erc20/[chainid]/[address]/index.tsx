@@ -356,7 +356,15 @@ export default function Erc20() {
           </Text>
         </main>
       )}
-      {valid && chain?.id != _chainId && (
+
+      {valid && isDisconnected && (
+        <main>
+          <HeadingComponent as="h2">Connect Wallet</HeadingComponent>
+          <Text py={4}> Please connect your wallet!</Text>
+        </main>
+      )}
+
+      {valid && !isDisconnected && chain?.id != _chainId && (
         <main>
           <HeadingComponent as="h2">Wrong Network</HeadingComponent>
           <Text py={4}>
@@ -370,7 +378,7 @@ export default function Erc20() {
         </main>
       )}
 
-      {valid && chain?.id === _chainId && (
+      {valid && !isDisconnected && chain?.id === _chainId && (
         <main>
           <HeadingComponent as="h2">ERC20 Helper</HeadingComponent>
           <Text py={4}>

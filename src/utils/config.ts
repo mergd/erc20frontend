@@ -3,7 +3,7 @@ import { mainnet, sepolia, polygon, optimism, arbitrum } from '@wagmi/chains'
 
 export const SITE_NAME = 'ERC20 Helper'
 export const SITE_DESCRIPTION = 'ERC20 Helper is a handy tool for multichain ERC20s'
-export const SITE_URL = 'https://nexth.vercel.app'
+export const SITE_URL = 'https://erc20helper-mergd.vercel.app'
 
 export const THEME_INITIAL_COLOR = 'system'
 export const THEME_COLOR_SCHEME: ThemingProps['colorScheme'] = 'gray'
