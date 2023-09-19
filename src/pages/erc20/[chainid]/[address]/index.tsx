@@ -54,6 +54,7 @@ export default function Erc20() {
   const [receipientString, setRecipientString] = useState<string>()
   const debouncedRecipientString = useDebounce(receipientString, 500)
   const [balance, setBalance] = useState<string>()
+  const debouncedBalance = useDebounce(balance, 500)
   const [decimals, setDecimals] = useState<number>(18)
   const [decimalsSet, setDecimalsSet] = useState<boolean>(false)
   const [symbol, setSymbol] = useState<string>()
@@ -136,8 +137,15 @@ export default function Erc20() {
     address: '0xecb504d39723b0be0e3a9aa33d646642d1051ee1',
     abi: erc20ABI,
     functionName: 'approve',
-    args: [receipientString ? (receipientString as Address) : zeroAddress, parseUnits(balance ? balance : '', decimals)],
+    args: [receipientString ? (receipientString as Address) : zeroAddress, parseUnits(debouncedBalance ? debouncedBalance : '', decimals)],
   })
+
+  const truncAddress = (address: string) => {
+    if (!isAddress(address)) {
+      return address
+    }
+    return address.slice(0, 20) + '...' + address.slice(-4)
+  }
 
   const { data: approveData, isLoading: isloadingApprove, isSuccess: approveSuccess, write: approveWrite } = useContractWrite(approveConfig)
 
@@ -145,7 +153,7 @@ export default function Erc20() {
     address: tokenAddress,
     abi: erc20ABI,
     functionName: 'transfer',
-    args: [receipientString ? (receipientString as Address) : zeroAddress, parseUnits(balance ? balance : '', decimals)],
+    args: [receipientString ? (receipientString as Address) : zeroAddress, parseUnits(debouncedBalance ? debouncedBalance : '', decimals)],
   })
 
   const { data: transferData, isLoading: isloadingTransfer, isSuccess: transferSuccess, write: transferWrite } = useContractWrite(transferConfig)
@@ -153,20 +161,18 @@ export default function Erc20() {
     address: tokenAddress,
     abi: mintABI,
     functionName: 'mint',
-    args: [receipientString ? (receipientString as Address) : zeroAddress, parseUnits(balance ? balance : '', decimals)],
+    args: [receipientString ? (receipientString as Address) : zeroAddress, parseUnits(debouncedBalance ? debouncedBalance : '', decimals)],
   })
 
   const { data: mintData, isLoading: isloadingMint, isSuccess: mintSuccess, write: mintWrite } = useContractWrite(mintConfig)
 
   const tokenDetailsCard = () => {
-    if (data1 && !name) {
+    if (data1 && !name && !isError1 && !isLoading1) {
       data1.decimals && setDecimals(data1.decimals)
       data1.decimals && setDecimalsSet(true)
       data1.symbol && setSymbol(data1.symbol)
       data1.name && setName(data1.name)
       data1.totalSupply && setTotalSupply(parseInt(formatUnits(data1.totalSupply.value, data1.decimals)).toLocaleString())
-
-      // setIsMintAvailable(checkMintConfig ? true : false)
     }
 
     return (
@@ -174,7 +180,7 @@ export default function Erc20() {
         <CardHeader>
           <Heading size="md">Token Details</Heading>
         </CardHeader>
-        {isError1 && <CardBody> There was an error loading these details. Double check the token address. </CardBody>}
+        {isError1 && <CardBody> There was an error loading these details. Double check the token address or the chain. </CardBody>}
         {isLoading1 && <CardBody>Loading...</CardBody>}
         {!isError1 && !isLoading1 && (
           <CardBody>
@@ -272,27 +278,35 @@ export default function Erc20() {
     )
   }
 
-  const addressInputBox = (
-    <InputGroup>
-      <InputLeftAddon>Address</InputLeftAddon>
-      <Input
-        value={receipientString}
-        onChange={(e) => {
-          const value = e.target.value
-          setRecipientString(value)
-        }}
-        placeholder="0x... or vitalik.eth"
-      />
-      <InputRightAddon>
-        <Icon as={FaPaste} onClick={handlePasteClick} />
-      </InputRightAddon>
-    </InputGroup>
-  )
+  const addressInputBox = (currAddress?: boolean) => {
+    return (
+      <InputGroup>
+        <InputLeftAddon>Address</InputLeftAddon>
+        <Input
+          value={receipientString ? truncAddress(receipientString) : receipientString}
+          onChange={(e) => {
+            const value = e.target.value
+            setRecipientString(value)
+          }}
+          placeholder="0x... or vitalik.eth"
+        />
+        <InputRightAddon>
+          {currAddress && (
+            <Text fontSize={'xs'} pr={2} onClick={() => setRecipientString(userAddr)}>
+              {' '}
+              CURRENT{' '}
+            </Text>
+          )}
+          <Icon as={FaPaste} onClick={handlePasteClick} />
+        </InputRightAddon>
+      </InputGroup>
+    )
+  }
 
   const transferDetail = (
     <Box>
       <Grid templateColumns={!isSmallerThanMd ? 'repeat(2, 1fr)' : ''} gap={4}>
-        <GridItem>{addressInputBox}</GridItem>
+        <GridItem>{addressInputBox()}</GridItem>
         <GridItem>
           {balanceInputBox('transfer')}
           {!decimalsSet && decimalButtons}
@@ -306,11 +320,31 @@ export default function Erc20() {
       </Grid>
     </Box>
   )
+
+  const preselectedAmounts = () => {
+    return (
+      <Stack spacing={1} direction={'row'} align={'center'} py={2}>
+        <Button onClick={() => setBalance('1')} colorScheme="gray" size="sm">
+          &nbsp;1&nbsp;
+        </Button>
+        <Button onClick={() => setBalance('10')} colorScheme="gray" size="sm">
+          10&nbsp;
+        </Button>
+        <Button onClick={() => setBalance('50')} colorScheme="gray" size="sm">
+          50&nbsp;
+        </Button>
+        <Button onClick={() => setBalance('100')} colorScheme="gray" size="sm">
+          100
+        </Button>
+      </Stack>
+    )
+  }
+
   // const transferFromDetail = <Box>{!decimalsSet && decimalButtons}</Box>
   const approve = (
     <Box>
       <Grid templateColumns={!isSmallerThanMd ? 'repeat(2, 1fr)' : ''} gap={4}>
-        <GridItem>{addressInputBox}</GridItem>
+        <GridItem>{addressInputBox()}</GridItem>
         <GridItem>
           {balanceInputBox('approve')}
           {!decimalsSet && decimalButtons}
@@ -328,9 +362,10 @@ export default function Erc20() {
     <Box>
       <Text py={4}> Mint testnet coins on testnet chains. Minting has to have this ABI: mint(address, uint256) in order to work. </Text>
       <Grid templateColumns={!isSmallerThanMd ? 'repeat(2, 1fr)' : ''} gap={4}>
-        <GridItem>{addressInputBox}</GridItem>
+        <GridItem>{addressInputBox(true)}</GridItem>
         <GridItem>
           {balanceInputBox()}
+          {preselectedAmounts()}
           {!decimalsSet && decimalButtons}
         </GridItem>
         <GridItem pt={-4}>
@@ -399,7 +434,7 @@ export default function Erc20() {
               <Tab>Transfer</Tab>
               {/* <Tab>Transfer From</Tab> */}
               <Tab>Approve</Tab>
-              <Tab disabled={isMintAvailable}>Mint</Tab>
+              <Tab disabled={mintWrite ? false : true}>Mint</Tab>
             </TabList>
             <TabPanels>
               <TabPanel>{tokenDetailsCard()}</TabPanel>

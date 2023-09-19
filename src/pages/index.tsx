@@ -46,6 +46,11 @@ export default function Home() {
             {' '}
             USDC on Polygon
           </LinkComponent>
+          &nbsp; or a &nbsp;
+          <LinkComponent underlined={true} href="/erc20/11155111/0x3e5e873700178e4E59CCcfd75b8dc74860F29e58">
+            {' '}
+            mock token on Sepolia
+          </LinkComponent>
           <br />
           <br />
           Mint various (supported) mock ERC20s to your wallet for testing as well.
